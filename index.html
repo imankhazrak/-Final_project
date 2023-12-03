@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="index.css">
+    <title>Term Project</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    
+    <script src="MultiTimeSeries.js"></script>
+    <script src="scatterplot.js"></script>
+    <script src="BarChart.js"></script>
+
+</head>
+<body>
+    <script>
+        
+        window.ActivePin1 = null;
+        window.ActivePin2 = null;
+        window.ActivePin3 = null;
+        window.map = null;
+        window.reddot = null;
+        window.fileName = "water_clean_grouped.csv";
+        window.markers = [];
+        window.soilvariables = ["TP", "TN", "m3_P", "m3_Fe", "m3_Al", "SPSC", "wEX_P", "wEX_NH3", "wEX_NOx", "pH", "EC"];
+        window.watervariables = ["TP", "TN", "disNH4", "disNO3", "disPO4"];
+        
+        window.savedCirclePosition = { x: 0, y: 0 };  //location of selected circle
+        window.WhichActivePin = 0;   //Selected circle belongs to which pin
+
+        function IsActiveMarker(marker)
+        {
+            if(ActivePin1 != null && ActivePin1 == marker)
+               return true;
+            
+            if(ActivePin2 != null && ActivePin2 == marker)
+               return true;
+            
+            if(ActivePin3 != null && ActivePin3 == marker)
+               return true;
+
+            return false;
+        }
+        function SetActiveMarker(marker)
+        {
+            if(ActivePin1 == null)
+            {
+                ActivePin1 = marker;
+                return true;
+            }
+            if(ActivePin2 == null)
+            {
+                ActivePin2 = marker;
+                return true;
+            }
+            if(ActivePin3 == null)
+            {
+                ActivePin3 = marker;
+                return true;
+            }
+            return false;
+        }
+        function DeActiveMarker(marker)
+        {
+            if(ActivePin1 != null && ActivePin1 == marker)
+            {
+                ActivePin1 = null;
+                if(WhichActivePin == 1)
+                {
+                    if (reddot != null && reddot.setMap) {
+                        // Remove the marker from the map
+                        reddot.setMap(null);
+                    }
+                    WhichActivePin = 0;
+                    savedCirclePosition.x = 0;
+                    savedCirclePosition.y = 0;
+                }
+                return true;
+            }
+            
+            if(ActivePin2 != null && ActivePin2 == marker)
+            {
+                ActivePin2 = null;
+                if(WhichActivePin == 2)
+                {
+                    if (reddot != null && reddot.setMap) {
+                        // Remove the marker from the map
+                        reddot.setMap(null);
+                    }
+                    WhichActivePin = 0;
+                    savedCirclePosition.x = 0;
+                    savedCirclePosition.y = 0;
+                }
+                return true;
+            }
+            
+            if(ActivePin3 != null && ActivePin3 == marker)
+            {
+                ActivePin3 = null;
+                if(WhichActivePin == 3)
+                {
+                    if (reddot != null && reddot.setMap) {
+                        // Remove the marker from the map
+                        reddot.setMap(null);
+                    }
+                    WhichActivePin = 0;
+                    savedCirclePosition.x = 0;
+                    savedCirclePosition.y = 0;
+                }
+                return true;
+            }
+            return false;
+        }
+        
+        function initMap() {
+            var myLatLng = {lat: 41.025196, lng:  -83.688760};
+    
+                map = new google.maps.Map(document.getElementById('Map'), {
+                center: myLatLng,
+                zoom: 16.2,
+                disableDefaultUI: true,
+                mapTypeControl: false,
+                draggable: false,
+                scaleControl: false,
+                scrollwheel: false,
+                navigationControl: false,
+                streetViewControl: false,
+                keyboardShortcuts: false,
+                mapTypeId: 'satellite'
+            });
+        }
+        function DrawPins()
+        {   
+
+                 // Load CSV file using D3.js
+            d3.csv(window.fileName).then(function(data) {
+                // Group data by wetid and calculate average x and y values
+                const groupedData = {};
+                const count = {}; // to keep track of the count for each wetid
+
+                data.forEach(row => {
+                    const wetid = row.Wetland_ID;
+                    if (!groupedData[wetid]) {
+                        groupedData[wetid] = { sum_x: 0, sum_y: 0 };
+                        count[wetid] = 0;
+                    }
+                    groupedData[wetid].sum_x += +row.x;
+                    groupedData[wetid].sum_y += +row.y;
+                    count[wetid]++;
+                });
+
+                // Calculate average x and y values
+                Object.keys(groupedData).forEach(wetid => {
+                    groupedData[wetid].avg_x = groupedData[wetid].sum_x / count[wetid];
+                    groupedData[wetid].avg_y = groupedData[wetid].sum_y / count[wetid];
+                });
+
+                var soilicon = {
+                    url: "images/pin.png",
+                    scaledSize: new google.maps.Size(10, 30), // size
+                };
+                
+                var watericon = {
+                    url: "images/pin.png",
+                    scaledSize: new google.maps.Size(10, 30), // size
+                };
+            
+                for (let i = 0; i < markers.length; i++) {
+                    window.markers[i].setMap(null);
+                }
+                // Clear the markers array
+                window.markers.length = 0;
+
+                Object.keys(groupedData).forEach(wetid => {
+                    const position = { lat: groupedData[wetid].avg_y, lng: groupedData[wetid].avg_x };
+                    const marker = new google.maps.Marker({
+                        position: position,
+                        map: map,
+                        title: wetid,
+                        icon: soilicon
+                    });
+                    window.markers.push(marker);
+
+                    marker.addListener('mouseover', function() {
+                        if(!IsActiveMarker(marker))
+                            marker.setIcon({
+                                url: 'images/pin.png', // Replace with the path to your marker icon
+                                scaledSize: new google.maps.Size(15, 45) // Increased size on mouseover
+                        });
+                        //showPopup(marker.title);
+                    });
+
+                    // Add mouseout event listener to close the info window
+                    marker.addListener('mouseout', function() {
+                        if(!IsActiveMarker(marker))
+                            marker.setIcon({
+                                url: 'images/pin.png', // Replace with the path to your marker icon
+                                scaledSize: new google.maps.Size(10, 30) // Increased size on mouseover
+                            });
+                    });
+                    marker.addListener('click', function() {
+                        if(IsActiveMarker(marker))
+                        {
+                            DeActiveMarker(marker);
+                            marker.setIcon({
+                                url: 'images/pin.png', // Replace with the path to your marker icon
+                                scaledSize: new google.maps.Size(10, 30) // Increased size on mouseover
+                            });
+                            drawPlot1();
+                            
+                        }
+                        else
+                        {
+                            if(SetActiveMarker(marker))
+                            {
+                                marker.setIcon({
+                                    url: 'images/activepin.png', // Replace with the path to your marker icon
+                                    scaledSize: new google.maps.Size(10, 30) // Increased size on mouseover
+                                });
+                                drawPlot1();
+                                showPopup(marker.title);
+                            }
+
+                        }
+                    });
+                });
+                
+                
+
+            });
+        };
+        
+        function CreateWaterTooltip(data, poolname)
+        {
+            const groupedData = {};
+                //const count = {}; // to keep track of the count for each wetid
+
+                data.forEach(row => {
+                    const wetid = row.Wetland_ID;
+                    if (!groupedData[wetid]) {
+                        groupedData[wetid] = {locname:"", MaxDept:0,slope_Ran:0, Bottom_Deviation:0, Volume:0, TP:0, TN:0, NH4:0,	NO3:0, disPO4:0, id:"", specloc:"", note:""};
+                        
+
+                    }
+                    groupedData[wetid].locname = row["locName"];
+                    groupedData[wetid].MaxDept = +row["Max Depth  (ft)"];
+                    groupedData[wetid].slope_Ran += +row["Slope Range"];
+                    groupedData[wetid].Bottom_Deviation += +row["Bottom Deviation of wetland"];
+                    groupedData[wetid].Volume += +row["Pool Volume (cu ft)_y"];
+                    
+                    groupedData[wetid].TP = +row["Total_Mean_TP"];
+                    groupedData[wetid].TN += +row["Total_Mean_TN"];
+                    groupedData[wetid].NH4 += +row["Total_Mean_disNH4"];
+                    groupedData[wetid].NO3 += +row["Total_Mean_disNO3"];
+                    groupedData[wetid].disPO4 += +row["Total_Mean_disPO4"];
+                    
+                    groupedData[wetid].id += +row["Total_Mean_disNH4"];
+                    groupedData[wetid].specloc += +row["Total_Mean_disNO3"];
+                    groupedData[wetid].note += +row["Total_Mean_disPO4"];
+                    
+                    //count[wetid]++;
+                });
+               
+                Object.keys(groupedData).forEach(wetid => {
+                    if(wetid == poolname){
+                        s= "";
+                        //s = wetid +"<br> Max Depth  (ft) : " + groupedData[wetid].MaxDept;
+                        s = "<table>";
+                        s += "<tr>";
+                            s += "<td colspan='2' class='center'><font color = #F1C16F><b>" + groupedData[wetid].locname + "</b></font></td>";
+                        s += "</tr>";
+                        s += "<tr>";
+                            s += "<td><font color=#F1C16F>Max Depth (ft): </font>" + groupedData[wetid].MaxDept.toFixed(2) + "</td>";
+                            s += "<td><font color=#F1C16F>Total Phosphorus: </font>" + groupedData[wetid].TP.toFixed(2) + "</td>";
+                        s += "</tr>";
+                        s += "<tr>";
+                            s += "<td ><font color=#F1C16F>Slope Range: </font>"+ groupedData[wetid].slope_Ran.toFixed(2) + "</td>";
+                            s += "<td><font color=#F1C16F>Total Nitrogen: </font>" + groupedData[wetid].TN.toFixed(2) + "</td>";
+                        s += "</tr>";
+                        s += "<tr>";
+                            s += "<td><font color=#F1C16F>Bottom Deviation of wetland: </font>" + groupedData[wetid].Bottom_Deviation.toFixed(2) + "</td>";
+                            s += "<td><font color=#F1C16F>Total NH4: </font>" + groupedData[wetid].NH4.toFixed(2) + "</td>";
+                        s += "</tr>";
+                        s += "<tr>";
+                            s += "<td><font color=#F1C16F>Pool Volume (cu ft): </font>" + groupedData[wetid].Volume.toFixed(2) + "</td>";
+                            s += "<td><font color=#F1C16F>Total NO3: </font>" + groupedData[wetid].NO3.toFixed(2) + "</td>";
+                        s += "</tr>";
+                        s += "<tr>";
+                            s += "<td></td>";
+                            s += "<td><font color=#F1C16F>Total disPO4: </font>" + groupedData[wetid].disPO4.toFixed(2) + "</td>";
+                        s += "</tr>";
+                        
+                        s += "</table>";
+                    }
+                });
+            return s;
+        }
+        
+        function CreateSoilTooltip(data, poolname)
+        {
+            const groupedData = {};
+                //const count = {}; // to keep track of the count for each wetid
+
+                data.forEach(row => {
+                    const wetid = row.Wetland_ID;
+                    if (!groupedData[wetid]) {
+                                                                                                            
+                        groupedData[wetid] = {locname:"", MaxDept:0,slope_Ran:0, Bottom_Deviation:0, Volume:0, TN:0, TP:0, m3_P:0,	m3_Fe:0, m3_AL:0, SPSC:0, wEX_P:0, wEX_NH3:0, wEX_NOx:0, pH:0, EC:0};
+                        
+
+                    }
+                   /* groupedData[wetid].locname = row["locName"];
+                    groupedData[wetid].MaxDept = +row["Max Depth  (ft)"];
+                    groupedData[wetid].slope_Ran += +row["Slope Range"];
+                    groupedData[wetid].Bottom_Deviation += +row["Bottom Deviation of wetland"];
+                    groupedData[wetid].Volume += +row["Pool Volume (cu ft)_y"];
+                    */
+                    groupedData[wetid].TP = +row["Total_Mean_TP"];
+                    groupedData[wetid].TN += +row["Total_Mean_TN"];
+                    groupedData[wetid].m3_P += +row["Total_Mean_m3_P"];
+                    groupedData[wetid].m3_Fe += +row["Total_Mean_m3_Fe"];
+                    groupedData[wetid].m3_AL += +row["Total_Mean_m3_AL"];
+                    groupedData[wetid].SPSC = +row["Total_Mean_SPSC"];
+                    groupedData[wetid].wEX_P += +row["Total_Mean_wEX_P"];
+                    groupedData[wetid].wEX_NH3 += +row["Total_Mean_wEX_NH3"];
+                    groupedData[wetid].wEX_NOx += +row["Total_Mean_wEX_NOx"];
+                    groupedData[wetid].pH += +row["Total_Mean_pH"];
+                    //groupedData[wetid].EC = +row["Total_Mean_EC"];
+                  
+                    //groupedData[wetid].id += +row["Totall_Mean_disNH4"];
+                    //groupedData[wetid].specloc += +row["Totall_Mean_disNO3"];
+                    //groupedData[wetid].note += +row["Totall_Mean_disPO4"];
+                    
+                    //count[wetid]++;
+                });
+               
+                Object.keys(groupedData).forEach(wetid => {
+                    if(wetid == poolname){
+                        s= "";
+                        //s = wetid +"<br> Max Depth  (ft) : " + groupedData[wetid].MaxDept;
+                        s = "<table>";
+                        s += "<tr>";
+                            s += "<td colspan='2' class='center'><font color = #F1C16F><b>" + groupedData[wetid].locname + "</b></font></td>";
+                        s += "</tr>";
+                        /*s += "<tr>";
+                            s += "<td><font color=#F1C16F>Max Depth (ft): </font>" + groupedData[wetid].MaxDept.toFixed(2) + "</td>";
+                            s += "<td><font color=#F1C16F>Total Phosphorus: </font>" + groupedData[wetid].TP.toFixed(2) + "</td>";
+                        s += "</tr>";
+                        s += "<tr>";
+                            s += "<td ><font color=#F1C16F>Slope Range: </font>"+ groupedData[wetid].slope_Ran.toFixed(2) + "</td>";
+                            s += "<td><font color=#F1C16F>Total Nitrogen: </font>" + groupedData[wetid].TN.toFixed(2) + "</td>";
+                        s += "</tr>";
+                        s += "<tr>";
+                            s += "<td><font color=#F1C16F>Bottom Deviation of wetland: </font>" + groupedData[wetid].Bottom_Deviation.toFixed(2) + "</td>";
+                            s += "<td><font color=#F1C16F>Total m3_P: </font>" + groupedData[wetid].m3_P.toFixed(2) + "</td>";
+                        s += "</tr>";
+                        s += "<tr>";
+                            s += "<td><font color=#F1C16F>Pool Volume (cu ft): </font>" + groupedData[wetid].Volume.toFixed(2) + "</td>";
+                            s += "<td><font color=#F1C16F>Total m3_Fe: </font>" + groupedData[wetid].m3_Fe.toFixed(2) + "</td>";
+                        s += "</tr>";*/
+                        s += "<tr>";
+                            s += "<td><font color=#F1C16F>Total Phosphorus: </font>" + groupedData[wetid].TP.toFixed(2) + "</td>";
+                            s += "<td><font color=#F1C16F>Total Nitrogen: </font>" + groupedData[wetid].TN.toFixed(2) + "</td>";
+                        s += "</tr>";
+                        s += "<tr>";
+                            s += "<td><font color=#F1C16F>Total m3_P: </font>" + groupedData[wetid].m3_P.toFixed(2) + "</td>";
+                            s += "<td><font color=#F1C16F>Total m3_Fe: </font>" + groupedData[wetid].m3_Fe.toFixed(2) + "</td>";
+                        s += "</tr>";
+                        s += "<tr>";
+                            s += "<td><font color=#F1C16F>Total m3_AL: </font>" + groupedData[wetid].m3_AL.toFixed(2) + "</td>";
+                            s += "<td><font color=#F1C16F>Total SPSC: </font>" + groupedData[wetid].SPSC.toFixed(2) + "</td>";
+                        s += "</tr>";
+                        s += "<tr>";
+                            s += "<td><font color=#F1C16F>Total wEX_P: </font>" + groupedData[wetid].wEX_P.toFixed(2) + "</td>";
+                            s += "<td><font color=#F1C16F>Total wEX_NH3: </font>" + groupedData[wetid].wEX_NH3.toFixed(2) + "</td>";
+                        s += "</tr>";
+                        s += "<tr>";
+                            s += "<td><font color=#F1C16F>Total wEX_NOx: </font>" + groupedData[wetid].wEX_NOx.toFixed(2) + "</td>";
+                            s += "<td><font color=#F1C16F>Total pH: </font>" + groupedData[wetid].pH.toFixed(2) + "</td>";
+                        s += "</tr>";
+                       /* s += "<tr>";
+                            s += "<td><font color=#F1C16F>Total EC: </font>" + groupedData[wetid].EC.toFixed(2) + "</td>";
+                        s += "</tr>";*/
+                        
+                        s += "</table>";
+                    }
+                });
+            return s;
+            
+        }
+        
+        function showPopup(poolname) {
+            d3.csv(window.fileName).then(function(data) {
+                // Group data by wetid and calculate average x and y values
+                s = "";
+                if(window.fileName == "water_clean_grouped.csv")
+                    s = CreateWaterTooltip(data, poolname);
+                else
+                    s = CreateSoilTooltip(data, poolname);
+                const popup = document.getElementById("tooltip1");
+                popup.innerHTML = s;
+            });
+                
+                
+        }    
+
+        
+        function ReturnRadio()
+
+        {   let checked_Var = "";
+            if(window.fileName == "water_clean_grouped.csv")
+                checked_Var = document.querySelector('input[name = "WaterVar"]:checked');
+            else
+                checked_Var = document.querySelector('input[name = "SoilVar"]:checked');
+
+            if(checked_Var != null)  //Test if something was checked
+                return checked_Var.value;
+            else
+                return ""; 
+        }
+
+        function ReturnWaterOrSoil()
+
+        {
+            var checked_Var = document.querySelector('input[name = "WhichType"]:checked');
+
+            if(checked_Var != null)  //Test if something was checked
+                return checked_Var.value;
+            else
+                return ""; 
+        }
+
+        function ReturnWaterOrSoilDiagram()
+
+        {
+            var checked_Var = document.querySelector('input[name = "WhichDiagram"]:checked');
+
+            if(checked_Var != null)  //Test if something was checked
+                return checked_Var.value;
+            else
+                return ""; 
+}
+
+        function handleRadioChange() {
+            drawPlot1();
+
+            if (reddot != null && reddot.setMap) {
+                        // Remove the marker from the map
+                        reddot.setMap(null);
+                    }
+            savedCirclePosition.x = 0;
+            savedCirclePosition.y = 0;
+            WhichActivePin = 0;
+
+        }
+        function handleDiagramRadioChange(diagram){
+            
+            var box1 = document.getElementById("top2-div1");
+            var box2 = document.getElementById("BarChart-div1");
+            
+            if(diagram.value == "BarChart")
+            {
+                box1.style.display = 'none';
+                box2.style.display = 'block';
+                //drawBarcChart();
+            }
+            else
+            {
+                box1.style.display = 'block';
+                box2.style.display = 'none';
+                drawPlot1();
+            }   
+        }
+        function handleTypeRadioChange(type)
+
+        {
+            if (type.value == "water")
+            {
+                window.fileName = "water_clean_grouped.csv";
+                DeActiveMarker(ActivePin1);
+                DeActiveMarker(ActivePin2);
+                DeActiveMarker(ActivePin3);
+                DrawPins();
+
+                
+                addRadioButtons(window.watervariables);
+
+
+                if (reddot != null && reddot.setMap) {
+                        // Remove the marker from the map
+                        reddot.setMap(null);
+                    }
+                savedCirclePosition.x = 0;
+                savedCirclePosition.y = 0;
+                WhichActivePin = 0;
+
+                drawPlot1();
+
+                FillDropDownScatter("x-axis-select", watervariables);
+                FillDropDownScatter("y-axis-select", watervariables);
+                
+                document.getElementById("y-axis-select").value = "TN";
+                var event = new Event("change");
+                document.getElementById("y-axis-select").dispatchEvent(event);
+
+                drawscatter();
+                
+                fillSelectCombo();
+                
+                var comboBox = document.getElementById("variable-selector");
+
+                // Get the selected value
+                var selectedValue = comboBox.value;
+                //drawChart(selectedValue);
+                var event = new Event("change");
+                comboBox.dispatchEvent(event);
+
+        
+            }
+            else
+            {
+                window.fileName = "soil_clean_grouped.csv";
+                DeActiveMarker(ActivePin1);
+                DeActiveMarker(ActivePin2);
+                DeActiveMarker(ActivePin3);
+                DrawPins();
+
+                addRadioButtons(window.soilvariables);
+
+
+                if (reddot != null && reddot.setMap) {
+                        // Remove the marker from the map
+                        reddot.setMap(null);
+                    }
+                savedCirclePosition.x = 0;
+                savedCirclePosition.y = 0;
+                WhichActivePin = 0;
+
+                drawPlot1();
+
+                FillDropDownScatter("x-axis-select", soilvariables);
+                FillDropDownScatter("y-axis-select", soilvariables);
+
+                document.getElementById("y-axis-select").value = "TN";
+                var event = new Event("change");
+                document.getElementById("y-axis-select").dispatchEvent(event);
+
+                drawscatter();
+        
+                fillSelectCombo();
+
+                var comboBox = document.getElementById("variable-selector");
+
+                // Get the selected value
+                var event = new Event("change");
+                comboBox.dispatchEvent(event);
+
+            }
+            object = document.getElementById("tooltip1")
+            object.innerHTML = "";
+            
+        }
+        
+        function addRadioButtons(type) {
+            // Container to hold radio buttons
+            var container = document.getElementById("bottom-right-div1");
+            container.innerHTML = "";
+            // Number of radio buttons you want
+            var numberOfRadioButtons = type.length;
+
+            // Loop to create and append radio buttons
+            for (var i = 0; i < numberOfRadioButtons; i++) {
+                // Create a radio button
+                var radioButton = document.createElement("input");
+                radioButton.type = "radio";
+                if(window.fileName == "water_clean_grouped.csv")
+                    radioButton.name = "WaterVar"; // Give the same name for radio buttons in a group
+                else
+                    radioButton.name = "SoilVar";
+
+                radioButton.id = type[i]; // Unique ID for each radio button
+                radioButton.value =  type[i];;
+                if(i == 0) 
+                    radioButton.checked = true;
+                // Create a label for the radio button
+                var label = document.createElement("label");
+                label.htmlFor = type[i];
+                label.appendChild(document.createTextNode(type[i])); // Set the label text
+
+                // Append the radio button and label to the container
+                container.appendChild(radioButton);
+                radioButton.addEventListener("change", handleRadioChange);
+                
+                container.appendChild(label);
+
+                // Add a line break for better spacing
+                container.appendChild(document.createElement("br"));
+                container.appendChild(document.createElement("br"));
+            }
+        }
+
+        function FillDropDownScatter(name, list)
+        {
+            var select = document.getElementById(name);
+
+            // Clear existing options
+            select.innerHTML = "";
+
+            // Create a default option
+            
+            // Populate the select with options from the fruits array
+            for (var i = 0; i < list.length; i++) {
+                var option = document.createElement("option");
+                option.text = list[i];
+                option.value = list[i];
+                select.add(option);
+            }
+
+        }
+    </script>
+     
+    
+    <div class = "container">
+        <div class="left-div">
+            <div class = "left0-div">
+                <input type="radio" id="WaterData" name="WhichType" value="water" onchange="handleTypeRadioChange(this)" checked>
+                <label for="WaterData">Water    </label>
+                <input type="radio" id="SoilData" name="WhichType" value="soil" onchange="handleTypeRadioChange(this)">
+                <label for="SoilData">Soil    </label>
+            </div>
+            <div id = "left1-div1" class = "left1-div">
+                Sample Information
+                
+                
+
+            </div>
+            <div id = "left2-div1" class = "left2-div">
+                <div id="correlation-box"></div>
+                <div id="my_datavizscatterplot"></div>
+            </div>
+            <div id="tootipCo"></div>
+            <div class = "left3-div">Scatter Plot Variables<br><br>
+                <label for="x-axis-select">Xaxis:</label>
+                <select id="x-axis-select"></select>
+            
+                <label for="y-axis-select">Yaxis:</label>
+                <select id="y-axis-select"></select>
+                
+            </div>
+        </div>
+        <div class="top-div">
+            <div class="top1-div">
+                Chemical Analysis of Water and Soil Samples
+            </div>
+        
+            <div class="top11-div">
+                <input type="radio" id="TimeLine" name="WhichDiagram" value="TimeLine" onchange="handleDiagramRadioChange(this)" >
+                <label for="TimeLine">TimeLine Series</label>
+                <input type="radio" id="BarChart" name="WhichDiagram" value="BarChart" onchange="handleDiagramRadioChange(this)" checked>
+                <label for="BarChart">Stack Bar Chart</label>
+            </div>
+
+            <div id= "top2-div1" class="top2-div">
+                <div id="plotArea" class="plotArea1"></div>
+                <div class="tooltip"></div>
+            </div>
+            <div id="BarChart-div1" class="BarChart-div">
+                <select id="variable-selector" style="position: absolute; top: 0; left: 50%; transform: translateX(-50%);"></select>
+                <svg id="my_dataviz" width="100%" height="95%"></svg>
+            </div>
+            <div id="tooltipBar" class="tooltipBar"></div>
+        </div>
+        <div class="bottom-div">
+            <div id="tooltip1" class="tooltip-div">hello</div>
+            <div id="Map" class="bottom-left-div">Map</div>
+            <div id = "bottom-right-div1" class="bottom-right-div"></div>
+        
+        </div>
+    </div>
+    <script> 
+        handleDiagramRadioChange(document.getElementById("BarChart"));
+        handleTypeRadioChange(document.getElementById("WaterData"));
+        
+        FillDropDownScatter("x-axis-select", watervariables);
+        FillDropDownScatter("y-axis-select", watervariables);
+        
+        document.getElementById("y-axis-select").value = "TN";
+        //var event = new Event("change");
+        //document.getElementById("y-axis-select").dispatchEvent(event);
+
+        drawscatter();
+
+        
+        iii();
+        //InitBarChart(); 
+        
+    </script>
+    
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyASKCcKQ2u7ycK2WfkffhSWMnNN97prquE&callback=initMap" async defer></script>
+</body>
+</html>

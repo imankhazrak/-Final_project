@@ -1,0 +1,272 @@
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+.box {
+    width: 100%; /* Adjust the width as needed */
+    height: 30vh; /* Adjust the height as needed */
+    background-color: #3498db;
+    margin-bottom: 10px; /* Adjust the margin between divs as needed */
+}
+.container {
+    position: absolute;
+    width: 100%; /* Adjust the width as needed */
+    height: 100%; /* Adjust the height as needed */
+   
+}
+
+
+.left-div{
+    position: absolute;
+    height: 100vh;
+    width: 20%;
+    left: 0;
+}
+.left0-div{
+    position: absolute;
+    height: 7%;
+    width: 100%;
+    left: 0;
+    top:0px;
+    border: 2px solid #333; /* Border color */
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3); /* Box shadow for 3D effect */
+    margin: 2%; /* Distance between divs */
+    border-radius: 10px;
+    
+    
+}
+
+.left1-div{
+    position: absolute;
+    height: 33.25%;
+    width: 100%;
+    left: 0;
+    top:9.25%;
+    border: 2px solid #333; /* Border color */
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3); /* Box shadow for 3D effect */
+    margin: 2%; /* Distance between divs */
+    border-radius: 10px;
+    
+    
+}
+.left2-div{
+    position: absolute;
+    height: 40%;
+    width: 100%;
+    left: 0;
+    top:45%;
+    border: 2px solid #333; /* Border color */
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3); /* Box shadow for 3D effect */
+    margin: 2%; /* Distance between divs */
+    border-radius: 10px;
+   
+}
+.left3-div{
+    position: absolute;
+    height: 10%;
+    width: 100%;
+    left: 0;
+    bottom: 0px;
+    border: 2px solid #333; /* Border color */
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3); /* Box shadow for 3D effect */
+    margin: 2%; /* Distance between divs */
+    border-radius: 10px;
+}
+
+.top-div {
+    position: absolute;
+    width: 77.5%;
+    height:45%;
+    left: 21%;
+    border: 2px solid #333; /* Border color */
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3); /* Box shadow for 3D effect */
+    margin: 0.5%; /* Distance between divs */
+    border-radius: 10px;
+}
+
+.top1-div {
+    position: absolute;
+    width: 100%;
+    height:10%;
+    left: 0%;
+    top:0%;
+    text-align:center;
+}
+.top11-div{
+    position: absolute;
+    width: 100%;
+    height:10%;
+    left: 0%;
+    top:10%;
+}
+.top2-div {
+    position: absolute;
+    width: 100%;
+    height:90%;
+    left: 0%;
+    top:20%;
+}
+.BarChart-div{
+    position: absolute;
+    width: 100%;
+    height:90%;
+    left: 0%;
+    top:20%;
+}
+.bottom-div {
+    position: absolute;
+    left:21%;
+    bottom: 0px;;
+    width: 78.5%;
+    height:52%;
+
+}
+.tooltip-div{
+    position: absolute;
+    left:10px;
+    top:5px;
+    width: 35%;
+    height:30%;
+    background-color: rgba(204, 140, 94, 0.3); /* Red with 80% opacity */
+    z-index: 2;
+ 
+    border: 2px solid #333; /* Border color */
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3); /* Box shadow for 3D effect */
+    border-radius: 10px;  
+
+}
+.bottom-left-div{
+    position: absolute;
+    left:0.5%;
+    width: 74%;
+    height:98%;
+    border: 2px solid #333; /* Border color */
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3); /* Box shadow for 3D effect */
+    border-radius: 10px;  
+
+}
+
+.bottom-right-div{
+    position: absolute;
+    right:0px;
+    width: 24%;
+    height:98%;
+    border: 2px solid #333; /* Border color */
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3); /* Box shadow for 3D effect */
+    border-radius: 10px;
+    overflow-y: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    color: white;
+
+}
+td {
+    padding-left: 4px;
+    text-align: left;
+    font-size: 12px;
+    font-family: 'Calibri', sans-serif;
+}
+.center {
+    text-align: center;
+}
+
+.axis-label {
+    font-size: 12px;
+    font-family: Arial, sans-serif;
+}
+.axis path, .axis line {
+    fill: none;
+    stroke: black;
+    shape-rendering: crispEdges;
+}
+.line {
+    fill: none;
+    stroke-width: 2;
+}
+.line.location1 { stroke: steelblue; }
+.line.location2 { stroke: rgb(255, 0, 0); }
+.line.location3 { stroke: forestgreen; }
+.circle {
+    fill: red;
+}
+.circle.location1 { fill: steelblue; }
+.circle.location2 { fill: rgb(255, 0, 0); }
+.circle.location3 { fill: forestgreen; }
+
+
+.tooltip {
+    position: absolute;
+    text-align: center;
+    width: 100px;
+    height: 28px;
+    padding: 1px;
+    font: 12px sans-serif;
+    background: lightsteelblue;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+    opacity: 0;
+}
+
+.grid line {
+    stroke: lightgray;
+    stroke-opacity: 0.9;
+    /* stroke-dasharray: 5, 5; */
+}
+
+.plotArea1 {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.tooltipCo {
+    position: absolute;
+    text-align: center;
+    width: 120px;
+    height: 28px;
+    padding: 2px;
+    font: 12px sans-serif;
+    background: lightsteelblue;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+}
+.tooltipBar {
+    position: absolute;
+    text-align: center;
+    width: 120px;
+    height: 28px;
+    padding: 2px;
+    font: 12px sans-serif;
+    background: lightsteelblue;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+    visibility: hidden;
+}
+
+#correlation-box {
+    position: absolute;
+    right:3px;
+    top:3px;
+    background-color: orange;
+    padding: 10px;
+    border-radius: 5px;
+    display: inline-block;
+    margin-left: 20px;
+}
+.grid line {
+    stroke: lightgray;
+    stroke-opacity: 0.9;
+   /* stroke-dasharray: 5, 5;*/
+}
+.grid path {
+    stroke-width: 0;
+}
+
+
