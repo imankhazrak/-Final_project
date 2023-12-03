@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Interactive Scatter Plot</title>
+    <!-- Load d3.js -->
+    <script src="https://d3js.org/d3.v4.js"></script>
+
+    <style>
+        .tooltip {
+            position: absolute;
+            text-align: center;
+            width: 120px;
+            height: 28px;
+            padding: 2px;
+            font: 12px sans-serif;
+            background: lightsteelblue;
+            border: 0px;
+            border-radius: 8px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Create dropdown menus for selecting axes -->
+<div>
+    <label for="x-axis-select">X-axis:</label>
+    <select id="x-axis-select">
+        <option value="TP">TP</option>
+        <option value="TN">TN</option>
+        <option value="disNH4">disNH4</option>
+        <option value="disNO3">disNO3</option>
+        <option value="disPO4">disPO4</option>
+        <option value="TDN">TDN</option>
+        <option value="TDP">TDP</option>
+    </select>
+
+    <label for="y-axis-select">Y-axis:</label>
+    <select id="y-axis-select">
+        <option value="TP">TP</option>
+        <option value="TN">TN</option>
+        <option value="disNH4">disNH4</option>
+        <option value="disNO3">disNO3</option>
+        <option value="disPO4">disPO4</option>
+        <option value="TDN">TDN</option>
+        <option value="TDP">TDP</option>
+    </select>
+</div>
+
+<!-- Create a div where the graph will take place -->
+<div id="my_dataviz"></div>
+
+<script>
+    // Set the dimensions and margins of the graph
+    var margin = {top: 30, right: 30, bottom: 40, left: 50},
+        width = 460 - margin.left - margin.right,
+        height = 400 - margin.top - margin.bottom;
+
+    // Append the svg object to the body of the page
+    var svg = d3.select("#my_dataviz")
+      .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    // Initialize tooltip
+    var tooltip = d3.select("body").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
+
+    // Function to calculate Pearson correlation coefficient
+    function pearsonCorrelation(x, y) {
+        let n = x.length;
+        let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0, sumY2 = 0;
+        for (let i = 0; i < n; i++) {
+            sumX += x[i];
+            sumY += y[i];
+            sumXY += (x[i] * y[i]);
+            sumX2 += (x[i] * x[i]);
+            sumY2 += (y[i] * y[i]);
+        }
+        let numerator = sumXY - (sumX * sumY / n);
+        let denominator = Math.sqrt((sumX2 - (sumX * sumX / n)) * (sumY2 - (sumY * sumY / n)));
+        if (denominator === 0) return 0;
+        return numerator / denominator;
+    }
+
+    // Color scale for seasons
+    var color = d3.scaleOrdinal()
+        .domain(["Spring", "Summer", "Fall", "Winter"])
+        .range(["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728"]);
+
+    // Function to update the chart
+    function updateChart(data, xVariable, yVariable) {
+        // Clear previous chart
+        svg.selectAll("*").remove();
+
+        // Create scales
+        var x = d3.scaleLinear()
+            .domain([0, d3.max(data, function(d) { return +d[xVariable]; })])
+            .range([0, width]);
+        var y = d3.scaleLinear()
+            .domain([0, d3.max(data, function(d) { return +d[yVariable]; })])
+            .range([height, 0]);
+
+        /// Add X axis
+        svg.append("g")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x));
+        // Add X axis label
+        svg.append("text")
+            .attr("transform", "translate(" + (width / 2) + " ," + (height + margin.bottom - 5) + ")")
+            .style("text-anchor", "middle")
+            .text(xVariable);
+        
+        // Add Y axis
+        svg.append("g")
+            .call(d3.axisLeft(y));
+        
+        // Add Y axis label
+        svg.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 0 - margin.left)
+            .attr("x", 0 - (height / 2))
+            .attr("dy", "1em")
+            .style("text-anchor", "middle")
+            .text(yVariable);
+
+        // Add dots
+        svg.selectAll("dot")
+            .data(data)
+            .enter()
+            .append("circle")
+                .attr("cx", function(d) { return x(d[xVariable]); })
+                .attr("cy", function(d) { return y(d[yVariable]); })
+                .attr("r", 5)
+                .style("fill", function(d) { return color(d.season); }) // Use color scale based on season
+                .on("mouseover", function(d) {
+                    d3.select(this).transition().duration(200).style("fill", "orange");
+                    tooltip.transition().duration(200).style("opacity", .9);
+                    tooltip.html(xVariable + ": " + d[xVariable] + "<br/>" + yVariable + ": " + d[yVariable])
+                        .style("left", (d3.event.pageX + 5) + "px")
+                        .style("top", (d3.event.pageY - 28) + "px");
+                })
+                .on("mouseout", function(d) {
+                    d3.select(this).transition().duration(500).style("fill", function(d) { return color(d.season); });
+                    tooltip.transition().duration(500).style("opacity", 0);
+                });
+
+        // Calculate and display the correlation coefficient
+        let xValues = data.map(d => +d[xVariable]);
+        let yValues = data.map(d => +d[yVariable]);
+        let correlation = pearsonCorrelation(xValues, yValues);
+        svg.append("text")
+            .attr("x", width- 0.5 * width)
+            .attr("y", 0)
+            .style("font-size", "14px")
+            .style("fill", "black")
+            .text("r = " + correlation.toFixed(2));
+        
+        // Add legend
+        var legend = svg.selectAll(".legend")
+            .data(color.domain())
+            .enter().append("g")
+            .attr("class", "legend")
+            .attr("transform", function(d, i) { 
+                return "translate(" + (width - 20) + "," + (height - 20 - (i * 20)) + ")"; 
+            });
+
+        legend.append("rect")
+            .attr("width", 18)
+            .attr("height", 18)
+            .style("fill", color);
+
+        legend.append("text")
+            .attr("x", -5)
+            .attr("y", 9)
+            .attr("dy", ".35em")
+            .style("text-anchor", "end")
+            .text(function(d) { return d; });
+    }
+
+    // Read the data from the CSV file
+    d3.csv("water_clean_grouped.csv", function(data) {
+        // Initial plot
+        updateChart(data, "TP", "TN");
+
+        // Event listeners for the dropdowns
+        d3.select("#x-axis-select").on("change", function() {
+            var selectedX = d3.select(this).property("value");
+            var selectedY = d3.select("#y-axis-select").property("value");
+            updateChart(data, selectedX, selectedY);
+        });
+
+        d3.select("#y-axis-select").on("change", function() {
+            var selectedX = d3.select("#x-axis-select").property("value");
+            var selectedY = d3.select(this).property("value");
+            updateChart(data, selectedX, selectedY);
+        });
+    });
+</script>
+</body>
+</html>
