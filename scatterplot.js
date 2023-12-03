@@ -117,11 +117,18 @@ function drawscatter() {
                 .attr("r", 5)
                 .style("fill", function(d) { return color(d.Crop_Season); })
                 .on("mouseover", function(event, d) {
-                    d3.select(this).transition().duration(200).style("fill", "red");
-                    tooltipCo.transition().duration(200).style("opacity", .9);
-                    tooltipCo.html( d.locName+ "<br/>" + d.visitDate)
+                    d3.select(this).transition()
+                        .duration(200)
+                        .style("fill", "red");
+                    tooltipCo.transition()
+                    .duration(200)
+                    .style("opacity", .9)
+                    .style("width", "100px")    // Set width, adjust as needed
+                    .style("height", "30px");
+                    tooltipCo.html( d.Wetland_ID+ "<br/>" + d.visitDate)
                     .style("left", (event.pageX + 5) + "px")
-                    .style("top", (event.pageY - 28) + "px");
+                    .style("top", (event.pageY - 28) + "px")
+                    .style("font-size", "14px");
                 })
                 .on("mouseout", function(d) {
                     d3.select(this).transition().duration(500).style("fill", function(d) { return color(d.Crop_Season); });
