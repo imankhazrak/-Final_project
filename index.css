@@ -167,7 +167,7 @@ body {
 .bottom-left-div{
     position: absolute;
     left:0.5%;
-    width: 74%;
+    width: 80%;
     height:98%;
     border: 2px solid  rgb(255, 255, 255); /* Border color */
     box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3); /* Box shadow for 3D effect */
@@ -178,7 +178,7 @@ body {
 .bottom-right-div{
     position: absolute;
     right:0px;
-    width: 24%;
+    width: 18%;
     height:98%;
     border: 2px solid  rgb(255, 255, 255); /* Border color */
     box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3); /* Box shadow for 3D effect */

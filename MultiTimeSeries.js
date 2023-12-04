@@ -51,7 +51,7 @@ function drawPlot1()
     function drawPlot() {
         d3.select("#plotArea").selectAll("*").remove();
 
-        let margin = { top: 5, right: 20, bottom: 20, left: 50 };
+        let margin = { top: 5, right: 20, bottom: 40, left: 50 };
         let width = document.getElementById("top2-div1").clientWidth - margin.left - margin.right;
         let height = document.getElementById("top2-div1").clientHeight - margin.top - margin.bottom - 10;
         let svg = d3.select("#plotArea").append("svg")
@@ -303,11 +303,11 @@ function drawPlot1()
          // Add legend
          let legend = svg.append("g")
          .attr("class", "legend")
-         .attr("transform", `translate(${width - 100}, ${margin.top})`); // Adjust position as needed
+         .attr("transform", `translate(${margin.left - 40}, ${height+27})`); // Adjust position as needed
  
          selectedLocationNames.forEach((location, index) => {
          let legendEntry = legend.append("g")
-             .attr("transform", `translate(0, ${index * 20})`); // Adjust spacing as needed
+             .attr("transform", `translate(${index * 170}, 0)`); // Adjust spacing as needed
  
          legendEntry.append("rect")
              .attr("width", 10)
