@@ -253,10 +253,12 @@ function drawPlot1()
                         reddot.setMap(null);
                     }
                     aa = document.getElementById("left1-div1");
-                    s = "Sample Information<br> Location: " + d["locName"] 
-                    +"<br> ID: " + d["sampleID"]
-                    +"<br> Type: " + d["samp_type"]
-                    +"<br> Notes: " + d["samp_notes"];
+                    s = "<center><font color='orange'>Sample Information</font></center>"+
+                    "<font color='orange' >ID:</font> " + d["sampleID"] +
+                    "<br><font color='orange' >Location:</font> " + d["locName"] +
+                    
+                    "<br> <font color='orange' >Type:</font> " + d["samp_type"] + 
+                    "<br><font color='orange' > Notes:</font> " + d["samp_notes"];
                     
                     aa.innerHTML = s;
                     

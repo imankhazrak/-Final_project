@@ -556,7 +556,7 @@
         function addRadioButtons(type) {
             // Container to hold radio buttons
             var container = document.getElementById("bottom-right-div1");
-            container.innerHTML = "";
+            container.innerHTML = "<br>";
             // Number of radio buttons you want
             var numberOfRadioButtons = type.length;
 
@@ -574,6 +574,7 @@
                 radioButton.value =  type[i];;
                 if(i == 0) 
                     radioButton.checked = true;
+                radioButton.style="margin-left: 20px;";
                 // Create a label for the radio button
                 var label = document.createElement("label");
                 label.htmlFor = type[i];
@@ -632,13 +633,14 @@
                 <div id="my_datavizscatterplot"></div>
             </div>
             <div id="tootipCo"></div>
-            <div class = "left3-div">Scatter Plot Variables<br><br>
-                <label for="x-axis-select">Xaxis:</label>
-                <select id="x-axis-select"></select>
+            <div class = "left3-div"><center><font size = '4px' color='orange'>Scatter Plot Variables</font></center>
+                <center>
+                    <label for="x-axis-select">Xaxis:</label>
+                    <select id="x-axis-select"></select>
             
-                <label for="y-axis-select">Yaxis:</label>
-                <select id="y-axis-select"></select>
-                
+                    <label for="y-axis-select">Yaxis:</label>
+                    <select id="y-axis-select"></select>
+                </center>
             </div>
         </div>
         <div class="top-div">

@@ -47,8 +47,8 @@ body {
 
 .left1-div{
     position: absolute;
-    height: 33.25%;
-    width: 100%;
+    height: 31%;
+    width: 92.5%;
     left: 0;
     top:9.25%;
     border: 2px solid  rgb(255, 255, 255); /* Border color */
@@ -57,6 +57,11 @@ body {
     border-radius: 10px;
     background-color: rgb(102, 92, 74);
     color: white;
+    font-size : 20px;
+    padding : 10px;
+    line-height: 1.5;
+    
+    
 }
 .left2-div{
     position: absolute;
@@ -83,6 +88,8 @@ body {
     border-radius: 10px;
     background-color: rgb(102, 92, 74);
     color: white;
+    font-size: 15px;
+    line-height: 1.7;
 }
 
 .top-div {
@@ -178,6 +185,7 @@ body {
     border-radius: 10px;
     overflow-y: auto;
     background-color: rgb(102, 92, 74);
+
 }
 
 table {
