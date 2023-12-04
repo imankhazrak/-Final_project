@@ -110,6 +110,8 @@ body {
     height:10%;
     left: 0%;
     top:10%;
+    color : white;
+    font-size : 20px;
 }
 .top2-div {
     position: absolute;
