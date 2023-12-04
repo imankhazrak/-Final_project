@@ -51,7 +51,7 @@ function drawPlot1()
     function drawPlot() {
         d3.select("#plotArea").selectAll("*").remove();
 
-        let margin = { top: 20, right: 20, bottom: 50, left: 50 };
+        let margin = { top: 5, right: 20, bottom: 20, left: 50 };
         let width = document.getElementById("top2-div1").clientWidth - margin.left - margin.right;
         let height = document.getElementById("top2-div1").clientHeight - margin.top - margin.bottom - 10;
         let svg = d3.select("#plotArea").append("svg")
@@ -164,27 +164,7 @@ function drawPlot1()
             }            return colors;
         }, {});
     
-        // Add legend
-        let legend = svg.append("g")
-            .attr("class", "legend")
-            .attr("transform", `translate(${width - 100}, ${margin.top-30})`); // Adjust position as needed
-    
-        selectedLocationNames.forEach((location, index) => {
-            let legendEntry = legend.append("g")
-                .attr("transform", `translate(0, ${index * 20})`); // Adjust spacing as needed
-    
-            legendEntry.append("rect")
-                .attr("width", 10)
-                .attr("height", 10)
-                .style("fill", locationColors[location]);
-    
-            legendEntry.append("text")
-                .attr("x", 15)
-                .attr("y", 7)
-                .text(location)
-                .style("font-size", "12px")
-                .attr("alignment-baseline","middle");
-        });
+       
             
 
         // Update Y-axis label
@@ -317,6 +297,28 @@ function drawPlot1()
                
             ii = ii + 1;
         }
+
+         // Add legend
+         let legend = svg.append("g")
+         .attr("class", "legend")
+         .attr("transform", `translate(${width - 100}, ${margin.top})`); // Adjust position as needed
+ 
+         selectedLocationNames.forEach((location, index) => {
+         let legendEntry = legend.append("g")
+             .attr("transform", `translate(0, ${index * 20})`); // Adjust spacing as needed
+ 
+         legendEntry.append("rect")
+             .attr("width", 10)
+             .attr("height", 10)
+             .style("fill", locationColors[location]);
+ 
+         legendEntry.append("text")
+             .attr("x", 15)
+             .attr("y", 7)
+             .text(location)
+             .style("font-size", "12px")
+             .attr("alignment-baseline","middle");
+     });
 
         if((window.savedCirclePosition.y != 0) || (window.savedCirclePosition.x != 0)){
             svg.append("circle")

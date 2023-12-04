@@ -454,6 +454,8 @@
             savedCirclePosition.y = 0;
             WhichActivePin = 0;
 
+            drawChart(ReturnRadio());
+
         }
         function handleDiagramRadioChange(diagram){
             
@@ -464,7 +466,7 @@
             {
                 box1.style.display = 'none';
                 box2.style.display = 'block';
-                //drawBarcChart();
+                drawChart(ReturnRadio());
             }
             else
             {
@@ -507,15 +509,9 @@
 
                 drawscatter();
                 
-                fillSelectCombo();
+                drawChart(ReturnRadio());
                 
-                var comboBox = document.getElementById("variable-selector");
-
-                // Get the selected value
-                var selectedValue = comboBox.value;
-                //drawChart(selectedValue);
-                var event = new Event("change");
-                comboBox.dispatchEvent(event);
+                
 
         
             }
@@ -548,15 +544,9 @@
                 document.getElementById("y-axis-select").dispatchEvent(event);
 
                 drawscatter();
+
+                drawChart(ReturnRadio());
         
-                fillSelectCombo();
-
-                var comboBox = document.getElementById("variable-selector");
-
-                // Get the selected value
-                var event = new Event("change");
-                comboBox.dispatchEvent(event);
-
             }
             object = document.getElementById("tooltip1")
             object.innerHTML = "";
@@ -625,10 +615,11 @@
     <div class = "container">
         <div class="left-div">
             <div class = "left0-div">
+                &nbsp&nbsp&nbsp&nbsp&nbsp
                 <input type="radio" id="WaterData" name="WhichType" value="water" onchange="handleTypeRadioChange(this)" checked>
-                <label for="WaterData">Water    </label>
+                <label for="WaterData">&nbspWater&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</label>
                 <input type="radio" id="SoilData" name="WhichType" value="soil" onchange="handleTypeRadioChange(this)">
-                <label for="SoilData">Soil    </label>
+                <label for="SoilData">&nbspSoil</label>
             </div>
             <div id = "left1-div1" class = "left1-div">
                 Sample Information
@@ -667,10 +658,10 @@
                 <div class="tooltip"></div>
             </div>
             <div id="BarChart-div1" class="BarChart-div">
-                <select id="variable-selector" style="position: absolute; top: 0; left: 50%; transform: translateX(-50%);"></select>
-                <svg id="my_dataviz" width="100%" height="95%"></svg>
+                <svg id="my_dataviz" width="100%" height="100%"></svg>
+                <div id="tooltipBar" class="tooltipBar"></div>
             </div>
-            <div id="tooltipBar" class="tooltipBar"></div>
+            
         </div>
         <div class="bottom-div">
             <div id="tooltip1" class="tooltip-div">hello</div>
@@ -693,7 +684,7 @@
         drawscatter();
 
         
-        iii();
+        drawChart(ReturnRadio());
         //InitBarChart(); 
         
     </script>

@@ -1,6 +1,6 @@
 function drawscatter() {
 
-    var margin = {top: 10, right: 10, bottom: 40, left: 50},
+    var margin = {top: 10, right: 10, bottom: 60, left: 50},
     width = document.getElementById("left2-div1").clientWidth - margin.left - margin.right,
     height = document.getElementById("left2-div1").clientHeight - margin.top - margin.bottom;
 
@@ -77,8 +77,9 @@ function drawscatter() {
         svg.append("g")
             .attr("transform", "translate(0," + height + ")")
             .call(d3.axisBottom(x));
+
         svg.append("text")
-            .attr("transform", "translate(" + (width / 2) + " ," + (height + margin.bottom - 5) + ")")
+            .attr("transform", "translate(" + (width / 2) + " ," + (height+margin.bottom - 25) + ")")
             .style("text-anchor", "middle")
             .text(xVariable);
 
@@ -141,13 +142,13 @@ function drawscatter() {
         d3.select("#correlation-box").html("Correlation = " + correlation.toFixed(2));
 
         // Add legend background
-            var legendBackground = svg.append("rect")
-            .attr("class", "legend-bg")
-            .attr("x", width - 130) // Adjust the position as needed
-            .attr("y", height - (color.domain().length * 20) - 10) // Adjust based on the number of items and spacing
-            .attr("width", 120) // Set the width of the legend box
-            .attr("height", color.domain().length * 20 + 10) // Height based on number of items
-            .style("fill", 'white') // Background color
+        //var legendBackground = svg.append("rect")
+        //    .attr("class", "legend-bg")
+        //    .attr("x", -30) // Adjust the position as needed
+        //    .attr("y", height + 30 ) // Adjust based on the number of items and spacing
+        //    .attr("width", 120) // Set the width of the legend box
+        //    .attr("height", color.domain().length * 20 + 10) // Height based on number of items
+        //    .style("fill", 'black') // Background color
 
         // Add legend
         var legend = svg.selectAll(".legend")
@@ -155,7 +156,7 @@ function drawscatter() {
             .enter().append("g")
             .attr("class", "legend")
             .attr("transform", function(d, i) { 
-                return "translate(" + (width - 30) + "," + (height - 20 - (i * 20)) + ")"; 
+                return "translate(" + (width - 30 - (i * 100)) + "," + (height + 40) + ")"; 
             });
 
         legend.append("rect")

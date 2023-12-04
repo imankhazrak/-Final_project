@@ -1,40 +1,9 @@
 
-function fillSelectCombo(){
-// List of numerical variables
-const water_variables = ["TP", "TN", "disNH4", "disNO3", "disPO4"];        
- 
-const soil_variables = ['TP', 'TN', 'm3_P', 'm3_Fe', 'm3_Al', 'SPSC', 'wEX_P', 'wEX_NH3', 'wEX_NOx', 'pH', 'EC'];
-
-variables = [];
-document.getElementById("variable-selector").innerHTML = "";
-   
-files = "";
-variables = [];   
-if (ReturnWaterOrSoil() == "water")
-{
-   files = "water_clean_grouped.csv";
-   variables = water_variables;
-}
-else
-{
-   files = "soil_clean_grouped.csv";
-   variables = soil_variables;
-}
-
-const selector = d3.select("#variable-selector");
-
- // Populate the dropdown
- variables.forEach(variable => {
-     selector.append("option")
-             .text(variable)
-             .attr("value", variable);
- });
-}
-function iii()
-{
-    fillSelectCombo();
+function drawChart(selectedVariable){
+    d3.select("#my_dataviz").selectAll("*").remove();
+   // fillSelectCombo();
  // Set dimensions and margins for the SVG
- const margin = { top: 20, right: 20, bottom: 80, left: 55 },
+ const margin = { top: 5, right: 20, bottom: 55, left: 55 },
        width = document.getElementById("BarChart-div1").clientWidth - margin.left - margin.right,
        height = document.getElementById("BarChart-div1").clientHeight - margin.top - margin.bottom;
 
@@ -47,9 +16,10 @@ function iii()
  const tooltipBar = d3.select("#tooltipBar");
 
  // Function to draw the chart
- function drawChart(selectedVariable) {
+ 
      // Clear existing chart
-    svg.selectAll("*").remove();
+     
+     
 
     files = "";
     if (ReturnWaterOrSoil() == "water")
@@ -145,28 +115,7 @@ function iii()
                                 .domain(subgroups)
                                 .range(["#587a33", "#ff7f0e"]);
 
-         // Add legend
-         const legend = svg.append("g")
-                         .attr("font-family", "sans-serif")
-                         .attr("font-size", 14)
-                         .attr("text-anchor", "end")
-                         .selectAll("g")
-                         .data(color.domain().slice().reverse())
-                         .enter().append("g")
-                             .attr("transform", (d, i) => `translate(0,${i * 20})`);
-
-         legend.append("rect")
-             .attr("x", width - 19)
-             .attr("width", 19)
-             .attr("height", 19)
-             .attr("fill", color);
-
-         legend.append("text")
-             .attr("x", width - 24)
-             .attr("y", 9.5)
-             .attr("dy", "0.32em")
-             .text(d => d);
-                     
+        
          // Show the bars
          svg.append("g")
             .selectAll("g")
@@ -190,17 +139,40 @@ function iii()
               .on("mouseout", function() {
                  tooltipBar.style("visibility", "hidden");
               });
+
+         // Add legend
+         const legend = svg.append("g")
+                         .attr("font-family", "sans-serif")
+                         .attr("font-size", 14)
+                         .attr("text-anchor", "end")
+                         .selectAll("g")
+                         .data(color.domain().slice().reverse())
+                         .enter().append("g")
+                             .attr("transform", (d, i) => `translate(0,${i * 20})`);
+
+         legend.append("rect")
+             .attr("x", width - 19)
+             .attr("width", 19)
+             .attr("height", 19)
+             .attr("fill", color);
+
+         legend.append("text")
+             .attr("x", width - 24)
+             .attr("y", 9.5)
+             .attr("dy", "0.32em")
+             .text(d => d);
+                     
      });
      
  }
 
  // Initial chart drawing
- drawChart(variables[0]);
-
- const selector1 = d3.select("#variable-selector");
+ //drawChart(variables[0]);
+//drawChart(ReturnRadio());
+ //const selector1 = d3.select("#variable-selector");
  // Update the chart when a new variable is selected
- selector1.on("change", function() {
-     const selectedVariable = d3.select(this).property("value");
-     drawChart(selectedVariable);
- });
-}
+ //selector1.on("change", function() {
+ //    const selectedVariable = d3.select(this).property("value");
+ //    drawChart(selectedVariable);
+ //});
+
