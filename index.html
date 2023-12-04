@@ -29,7 +29,7 @@
         
         window.savedCirclePosition = { x: 0, y: 0 };  //location of selected circle
         window.WhichActivePin = 0;   //Selected circle belongs to which pin
-
+        window.selectedItemId = null;
         function IsActiveMarker(marker)
         {
             if(ActivePin1 != null && ActivePin1 == marker)
@@ -72,6 +72,8 @@
                     if (reddot != null && reddot.setMap) {
                         // Remove the marker from the map
                         reddot.setMap(null);
+                        const popup = document.getElementById("left1-div1");
+                        popup.innerHTML = "";
                     }
                     WhichActivePin = 0;
                     savedCirclePosition.x = 0;
@@ -88,6 +90,8 @@
                     if (reddot != null && reddot.setMap) {
                         // Remove the marker from the map
                         reddot.setMap(null);
+                        const popup = document.getElementById("left1-div1");
+                        popup.innerHTML = "";
                     }
                     WhichActivePin = 0;
                     savedCirclePosition.x = 0;
@@ -104,6 +108,8 @@
                     if (reddot != null && reddot.setMap) {
                         // Remove the marker from the map
                         reddot.setMap(null);
+                        const popup = document.getElementById("left1-div1");
+                        popup.innerHTML = "";
                     }
                     WhichActivePin = 0;
                     savedCirclePosition.x = 0;
@@ -409,7 +415,7 @@
         
         function ReturnRadio()
 
-        {   let checked_Var = "";
+        {   /*let checked_Var = "";
             if(window.fileName == "water_clean_grouped.csv")
                 checked_Var = document.querySelector('input[name = "WaterVar"]:checked');
             else
@@ -418,7 +424,8 @@
             if(checked_Var != null)  //Test if something was checked
                 return checked_Var.value;
             else
-                return ""; 
+                return ""; */
+            return selectedItemId;
         }
 
         function ReturnWaterOrSoil()
@@ -449,6 +456,8 @@
             if (reddot != null && reddot.setMap) {
                         // Remove the marker from the map
                         reddot.setMap(null);
+                        const popup = document.getElementById("left1-div1");
+                        popup.innerHTML = "";
                     }
             savedCirclePosition.x = 0;
             savedCirclePosition.y = 0;
@@ -493,6 +502,8 @@
                 if (reddot != null && reddot.setMap) {
                         // Remove the marker from the map
                         reddot.setMap(null);
+                        const popup = document.getElementById("left1-div1");
+                        popup.innerHTML = "";
                     }
                 savedCirclePosition.x = 0;
                 savedCirclePosition.y = 0;
@@ -529,6 +540,8 @@
                 if (reddot != null && reddot.setMap) {
                         // Remove the marker from the map
                         reddot.setMap(null);
+                        const popup = document.getElementById("left1-div1");
+                        popup.innerHTML = "";
                     }
                 savedCirclePosition.x = 0;
                 savedCirclePosition.y = 0;
@@ -554,44 +567,73 @@
         }
         
         function addRadioButtons(type) {
-            // Container to hold radio buttons
+            // Container to hold the list view
             var container = document.getElementById("bottom-right-div1");
-            container.innerHTML = "<br>";
-            // Number of radio buttons you want
-            var numberOfRadioButtons = type.length;
+            container.innerHTML = ""; // Clear previous content
 
-            // Loop to create and append radio buttons
-            for (var i = 0; i < numberOfRadioButtons; i++) {
-                // Create a radio button
-                var radioButton = document.createElement("input");
-                radioButton.type = "radio";
-                if(window.fileName == "water_clean_grouped.csv")
-                    radioButton.name = "WaterVar"; // Give the same name for radio buttons in a group
-                else
-                    radioButton.name = "SoilVar";
+            // Create a list view
+            var listView = document.createElement("ul");
+            listView.id = "ul1";
+            listView.style.listStyleType = "none";
 
-                radioButton.id = type[i]; // Unique ID for each radio button
-                radioButton.value =  type[i];;
-                if(i == 0) 
-                    radioButton.checked = true;
-                radioButton.style="margin-left: 20px;";
-                // Create a label for the radio button
+            // Number of items in the list view
+            var numberOfItems = type.length;
+
+            // Variable to keep track of the currently selected item
+            
+           
+            // Loop to create and append list items
+            for (var i = 0; i < numberOfItems; i++) {
+                // Create a list item
+                var listItem = document.createElement("li");
+
+                // Set a unique identifier for each list item
+                listItem.id = type[i];
+                listItem.className = "li1";
+        
+                if(i == 0)
+                    selectedItemId = listItem.id;
+                // Create a label for the list item
                 var label = document.createElement("label");
-                label.htmlFor = type[i];
                 label.appendChild(document.createTextNode(type[i])); // Set the label text
 
-                // Append the radio button and label to the container
-                container.appendChild(radioButton);
-                radioButton.addEventListener("change", handleRadioChange);
-                
-                container.appendChild(label);
+                // Append the label to the list item
+                listItem.appendChild(label);
+
+                // Set tabindex to -1 to prevent focus
+                listItem.tabIndex = -1;
+
+                // Add an event listener to the list item
+                listItem.addEventListener("click", function (event) {
+                    handleItemClick(event.currentTarget.id);
+                });
+
+                // Append the list item to the list view
+                listView.appendChild(listItem);
 
                 // Add a line break for better spacing
-                container.appendChild(document.createElement("br"));
-                container.appendChild(document.createElement("br"));
-
-                
+                //listView.appendChild(document.createElement("br"));
             }
+
+            // Append the list view to the container
+            container.appendChild(listView);
+
+            function handleItemClick(clickedItemId) {
+                // Reset the color of the previously selected item
+                if (selectedItemId !== null) {
+                    document.getElementById(selectedItemId).style.backgroundColor = "";
+                }
+
+                // Change the color of the clicked item
+                document.getElementById(clickedItemId).style.backgroundColor = "rgb(242, 193, 112)";
+
+                // Update the selectedItemId
+                selectedItemId = clickedItemId;
+                handleRadioChange();
+            }
+            
+            handleItemClick(selectedItemId);
+
         }
 
         function FillDropDownScatter(name, list)

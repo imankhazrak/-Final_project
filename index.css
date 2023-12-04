@@ -185,9 +185,28 @@ body {
     border-radius: 10px;
     overflow-y: auto;
     background-color: rgb(102, 92, 74);
-
+    text-align:center;
+    
 }
-
+#ul1 {
+    display: inline-block; /* Make the list an inline block */
+    text-align: center; /* Reset text alignment to left for list items */
+    padding-left: 0; /* Remove default left padding for the list */
+    
+}
+.li1 {
+    display: inline-block; 
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-top: 5px;   
+    padding-bottom: 5px;
+    width : calc(55%);
+    border: 2px solid  rgb(255, 255, 255); /* Border color */
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3); /* Box shadow for 3D effect */
+    border-radius: 20px;
+    margin-bottom: 10px;
+    background-color: rgb(87, 122, 51);
+}
 table {
     width: 100%;
     border-collapse: collapse;

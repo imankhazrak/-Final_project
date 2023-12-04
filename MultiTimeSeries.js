@@ -251,6 +251,7 @@ function drawPlot1()
                     if (reddot != null && reddot.setMap) {
                         // Remove the marker from the map
                         reddot.setMap(null);
+                        
                     }
                     aa = document.getElementById("left1-div1");
                     s = "<center><font color='orange'>Sample Information</font></center>"+
